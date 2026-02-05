@@ -2,16 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>DevOps Website</title>
+  <title>DevOps Store</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Welcome to DevOps Website</h1>
-  <p>This static site is hosted on GitHub Pages.</p>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <h1 class="logo">DevOps Store</h1>
+    <div class="cart">
+      🛒 Cart: <span id="cart-count">0</span>
+    </div>
+  </nav>
 
-  <button onclick="showMessage()">Test JavaScript</button>
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <h2>Premium Tech Products</h2>
+    <p>Simple. Powerful. DevOps Ready.</p>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="products">
+    <div class="product-card">
+      <img src="https://via.placeholder.com/250" alt="Product">
+      <h3>Cloud Server</h3>
+      <p>$199</p>
+      <button onclick="addToCart()">Add to Cart</button>
+    </div>
+
+    <div class="product-card">
+      <img src="https://via.placeholder.com/250" alt="Product">
+      <h3>DevOps Toolkit</h3>
+      <p>$99</p>
+      <button onclick="addToCart()">Add to Cart</button>
+    </div>
+
+    <div class="product-card">
+      <img src="https://via.placeholder.com/250" alt="Product">
+      <h3>Automation Suite</h3>
+      <p>$149</p>
+      <button onclick="addToCart()">Add to Cart</button>
+    </div>
+  </section>
 
   <script src="script.js"></script>
 </body>
 </html>
+
