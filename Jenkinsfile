@@ -10,7 +10,7 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                sh '''
+                bat '''
                     git config user.email "jenkins@example.com"
                     git config user.name "Jenkins"
                     git checkout -b gh-pages
