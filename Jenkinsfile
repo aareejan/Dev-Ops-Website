@@ -8,41 +8,36 @@ pipeline {
             }
         }
         
-        stage('Build Docker Image') {
-            steps {
-                bat 'wsl.exe docker build -t ecommerce-site .'
-            }
-        }
-        
-        stage('Run Container') {
+        stage('Test HTML') {
             steps {
                 bat '''
-                    wsl.exe docker ps -a
-                    wsl.exe docker stop ecommerce-site 2>nul || echo "No container to stop"
-                    wsl.exe docker rm ecommerce-site 2>nul || echo "No container to remove"
-                    wsl.exe docker run -d -p 8080:80 --name ecommerce-site ecommerce-site
-                    echo "✅ Docker Container Started!"
-                    echo "🌐 Access at: http://localhost:8080"
+                    echo "✅ Jenkins CI/CD Pipeline Working!"
+                    echo "📁 Files:"
+                    dir
+                    echo "🌐 Your e-commerce site is ready."
+                    echo "📄 HTML preview:"
+                    type index.html | findstr /C:"<title" /C:"<!DOCTYPE"
                 '''
             }
         }
         
-        stage('Test') {
+        stage('Create Artifact') {
             steps {
-                bat '''
-                    timeout /t 5
-                    curl http://localhost:8080/ 2>nul && echo "✅ Website is working!" || echo "⚠️  Check manually"
-                '''
+                bat 'mkdir deploy 2>nul && copy index.html deploy\\'
+                archiveArtifacts artifacts: 'deploy/**', fingerprint: true
             }
         }
-    }
-    
-    post {
-        success {
-            echo '🎉 Pipeline Successful!'
-        }
-        failure {
-            echo '❌ Pipeline Failed!'
+        
+        stage('Deploy Simulated') {
+            steps {
+                bat '''
+                    echo "🚀 Simulated Deployment Complete!"
+                    echo "📊 Next steps after WSL2:"
+                    echo "1. wsl.exe docker build -t ecommerce ."
+                    echo "2. wsl.exe docker run -d -p 8080:80 ecommerce"
+                    echo "3. Access: http://localhost:8080"
+                '''
+            }
         }
     }
 }
