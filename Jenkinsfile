@@ -2,40 +2,61 @@ pipeline {
     agent any
     
     stages {
-        stage('Checkout') {
+        stage('Checkout from GitHub') {
             steps {
                 checkout scm
             }
         }
         
-        stage('Test HTML') {
+        stage('Start Docker in WSL') {
             steps {
                 bat '''
-                    echo "✅ Jenkins CI/CD Pipeline Working!"
-                    echo "📁 Files:"
-                    dir
-                    echo "🌐 Your e-commerce site is ready."
-                    echo "📄 HTML preview:"
-                    type index.html | findstr /C:"<title" /C:"<!DOCTYPE"
+                    echo Starting Docker in WSL...
+                    wsl.exe sudo service docker start
+                    timeout /t 10
+                    wsl.exe docker --version
                 '''
             }
         }
         
-        stage('Create Artifact') {
+        stage('Build Docker Image in WSL') {
             steps {
-                bat 'mkdir deploy 2>nul && copy index.html deploy\\'
-                archiveArtifacts artifacts: 'deploy/**', fingerprint: true
+                bat '''
+                    echo Building Docker image in WSL...
+                    wsl.exe docker build -t ecommerce-site:latest .
+                    echo Image built successfully!
+                '''
             }
         }
         
-        stage('Deploy Simulated') {
+        stage('Run Container on Port 9090') {
             steps {
                 bat '''
-                    echo "🚀 Simulated Deployment Complete!"
-                    echo "📊 Next steps after WSL2:"
-                    echo "1. wsl.exe docker build -t ecommerce ."
-                    echo "2. wsl.exe docker run -d -p 8080:80 ecommerce"
-                    echo "3. Access: http://localhost:8080"
+                    echo Running Docker container on port 9090...
+                    wsl.exe docker stop ecommerce-container 2>/dev/null || echo "No container to stop"
+                    wsl.exe docker rm ecommerce-container 2>/dev/null || echo "No container to remove"
+                    wsl.exe docker run -d -p 9090:80 --name ecommerce-container ecommerce-site:latest
+                    
+                    echo ========================================
+                    echo ✅ DOCKER CONTAINER DEPLOYED!
+                    echo 🌐 URL: http://localhost:9090
+                    echo 📍 Port: 9090
+                    echo 🐳 Container: ecommerce-container
+                    echo ========================================
+                '''
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                bat '''
+                    echo Verifying deployment...
+                    timeout /t 5
+                    curl http://localhost:9090/ 2>nul && (
+                        echo ✅ WEBSITE IS ACCESSIBLE!
+                    ) || (
+                        echo ⚠️  Manual check needed: Open browser to http://localhost:9090
+                    )
                 '''
             }
         }
