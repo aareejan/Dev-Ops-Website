@@ -13,7 +13,7 @@ pipeline {
                 bat '''
                     echo Starting Docker in WSL...
                     wsl.exe sudo service docker start
-                    timeout /t 10
+                    ping -n 10 127.0.0.1 > nul
                     wsl.exe docker --version
                 '''
             }
@@ -33,8 +33,8 @@ pipeline {
             steps {
                 bat '''
                     echo Running Docker container on port 9090...
-                    wsl.exe docker stop ecommerce-container 2>/dev/null || echo "No container to stop"
-                    wsl.exe docker rm ecommerce-container 2>/dev/null || echo "No container to remove"
+                    wsl.exe docker stop ecommerce-container 2>nul || echo "No container to stop"
+                    wsl.exe docker rm ecommerce-container 2>nul || echo "No container to remove"
                     wsl.exe docker run -d -p 9090:80 --name ecommerce-container ecommerce-site:latest
                     
                     echo ========================================
@@ -51,11 +51,11 @@ pipeline {
             steps {
                 bat '''
                     echo Verifying deployment...
-                    timeout /t 5
+                    ping -n 5 127.0.0.1 > nul
                     curl http://localhost:9090/ 2>nul && (
                         echo ✅ WEBSITE IS ACCESSIBLE!
                     ) || (
-                        echo ⚠️  Manual check needed: Open browser to http://localhost:9090
+                        echo ⚠️  Manual check: Open browser to http://localhost:9090
                     )
                 '''
             }
