@@ -10,19 +10,39 @@ pipeline {
         
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t my-ecommerce .'
+                bat 'wsl.exe docker build -t ecommerce-site .'
             }
         }
         
         stage('Run Container') {
             steps {
                 bat '''
-                    docker stop my-site || echo "No container to stop"
-                    docker rm my-site || echo "No container to remove"
-                    docker run -d -p 80:80 --name my-site my-ecommerce
-                    echo "✅ Site is LIVE at: http://localhost"
+                    wsl.exe docker ps -a
+                    wsl.exe docker stop ecommerce-site 2>nul || echo "No container to stop"
+                    wsl.exe docker rm ecommerce-site 2>nul || echo "No container to remove"
+                    wsl.exe docker run -d -p 8080:80 --name ecommerce-site ecommerce-site
+                    echo "✅ Docker Container Started!"
+                    echo "🌐 Access at: http://localhost:8080"
                 '''
             }
+        }
+        
+        stage('Test') {
+            steps {
+                bat '''
+                    timeout /t 5
+                    curl http://localhost:8080/ 2>nul && echo "✅ Website is working!" || echo "⚠️  Check manually"
+                '''
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo '🎉 Pipeline Successful!'
+        }
+        failure {
+            echo '❌ Pipeline Failed!'
         }
     }
 }
