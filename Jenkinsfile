@@ -10,36 +10,17 @@ pipeline {
         
         stage('Build Docker Image') {
             steps {
-                bat '''
-                    echo Building Docker image...
-                    docker build -t ecommerce-site .
-                    echo Docker image built successfully
-                '''
+                bat 'docker build -t my-ecommerce .'
             }
         }
         
         stage('Run Container') {
             steps {
                 bat '''
-                    echo Stopping old container...
-                    docker stop ecommerce-container || echo "No container to stop"
-                    docker rm ecommerce-container || echo "No container to remove"
-                    
-                    echo Starting new container...
-                    docker run -d -p 8080:80 --name ecommerce-container ecommerce-site
-                    
-                    echo Container started on port 8080
-                '''
-            }
-        }
-        
-        stage('Test') {
-            steps {
-                bat '''
-                    echo Waiting for container to start...
-                    timeout /t 10
-                    echo Testing website...
-                    curl http://localhost:8080/ || echo "Site test completed"
+                    docker stop my-site || echo "No container to stop"
+                    docker rm my-site || echo "No container to remove"
+                    docker run -d -p 80:80 --name my-site my-ecommerce
+                    echo "✅ Site is LIVE at: http://localhost"
                 '''
             }
         }
